@@ -24,17 +24,17 @@ func TestEchoCmdParameter(t *testing.T) {
 
 // 测试1.4-dup
 func TestDup(t *testing.T) {
-	f1, err := os.Open("/Users/reki/Program/Go/src/pratice/exercise/chapter1_0.text")
+	f1, err := os.Open("/Users/reki/Program/Go/src/pratice/exercise/resource/chapter1_0.text")
 	if err != nil {
 		log.Println(err)
 	}
 	defer f1.Close()
-	f2, err := os.Open("/Users/reki/Program/Go/src/pratice/exercise/chapter1_1.text")
+	f2, err := os.Open("/Users/reki/Program/Go/src/pratice/exercise/resource/chapter1_1.text")
 	if err != nil {
 		log.Println(err)
 	}
 	defer f2.Close()
-	f3, err := os.Open("/Users/reki/Program/Go/src/pratice/exercise/chapter1_2.text")
+	f3, err := os.Open("/Users/reki/Program/Go/src/pratice/exercise/resource/chapter1_2.text")
 	if err != nil {
 		log.Println(err)
 	}
@@ -44,12 +44,40 @@ func TestDup(t *testing.T) {
 	f = append(f, f2)
 	f = append(f, f3)
 	res := dup(f)
-	for k, v := range res{
+	for k, v := range res {
 		n := strings.Join(v, " ")
 		fmt.Printf("total has %s in:%s\n", k, n)
 	}
 }
 
+// 测试1.7
+func TestFetch(t *testing.T) {
+	urlstring := "http://192.168.1.101:8096"
+	if err := fetch(urlstring); err != nil {
+		t.Error(err)
+	}
+}
+
+// 测试1.8
+func TestFetchAddPrefix(t *testing.T) {
+	urlstring := "192.168.1.101:8096"
+	if err := fetchAddPrefix(urlstring); err != nil {
+		t.Error(err)
+	}
+}
+
+// 测试1.10
+func TestFetchAll(t *testing.T) {
+	urlList := []string{"http://www.baidu.com", "https://www.douyu.com", "https://www.google.com"}
+	ch := make(chan string)
+	for _, s := range urlList {
+		go fetchAll(s, ch)
+	}
+	for range urlList {
+		s := <-ch
+		fmt.Println(s)
+	}
+}
 func TestServe1(t *testing.T) {
 	req := httptest.NewRequest("GET", "http://127.0.0.1/?Cycles=10", nil)
 	w := httptest.NewRecorder()
@@ -59,7 +87,7 @@ func TestServe1(t *testing.T) {
 
 	fmt.Println(res.Status)
 	fmt.Println(res.Header.Get("Content-Type"))
-	f, err := os.Create("/Users/reki/Program/Go/src/pratice/exercise/chapter1_web_lisajous_result.gif")
+	f, err := os.Create("/Users/reki/Program/Go/src/pratice/exercise/resource/chapter1_web_lisajous_result.gif")
 	if err != nil {
 		fmt.Println(err)
 	}

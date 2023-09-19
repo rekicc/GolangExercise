@@ -53,7 +53,8 @@ type fileInfo struct {
 	name    string
 	content map[string][]int
 }
-//解析文件的内容
+
+// 解析文件的内容
 func paraseFileStruct(f []*os.File) (r []fileInfo) {
 	for _, f1 := range f {
 		//必须在每次循环开始的时候都初始化一次fi, 这个fi存储每个文件的分析结果, 在分析完后会填充到返回值r中, 如果在循环外初始化会导致对每个文件的分析结果会被下一个结果覆盖
@@ -72,12 +73,14 @@ func paraseFileStruct(f []*os.File) (r []fileInfo) {
 	}
 	return
 }
-//将文件的绝对路径切分, 只留文件名
+
+// 将文件的绝对路径切分, 只留文件名
 func splitFilename(n string) string {
 	_, filename := path.Split(n)
 	return filename
 }
-//接收paraseFileStruct解析后的内容, 分析其中是否有重复
+
+// 接收paraseFileStruct解析后的内容, 分析其中是否有重复
 func dup(f []*os.File) map[string][]string {
 	res := paraseFileStruct(f)
 	resLen := len(res)
@@ -109,7 +112,9 @@ func dup(f []*os.File) map[string][]string {
 	return str
 }
 
+// 练习1.5, 1.6只是改几个参数,没做, 这里是原版的lissajous源码, 唯一的问题是lissajous具体怎么画出来gif图的
 var palette = []color.Color{color.White, color.Black}
+
 const (
 	whiteIndex = 0 // first color in palette
 	blackIndex = 1 // next color in palette
@@ -144,6 +149,59 @@ func lissajous(out io.Writer, cycles int) {
 		log.Println(err)
 	}
 }
+
+// 练习1.7, 1.9, 将获取到的内容输出到os.stdout, 并且打印状态码
+func fetch(urlstring string) error {
+	resp, err := http.Get(urlstring)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	s := os.Stdout
+	_, err = io.Copy(s, resp.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println()
+	fmt.Println(resp.Status)
+	return nil
+}
+
+// 练习1.8, 如果URL没有http://前缀, 则为该URL添加这个前缀
+func fetchAddPrefix(urlstring string) error {
+	if strings.HasPrefix(urlstring, "http://") {
+		return fetch(urlstring)
+	}
+	urlstring = "http://" + urlstring
+	return fetch(urlstring)
+}
+
+// 练习1.10
+func fetchAll(urlstring string, ch chan<- string) {
+	startTime := time.Now()
+	resp, err := http.Get(urlstring)
+	if err != nil {
+		ch <- fmt.Sprintln(err)
+		return
+	}
+	defer resp.Body.Close()
+	n := rand.Int31()
+	filename := "/users/reki/Program/Go/src/pratice/exercise/resource/" + strconv.Itoa(int(n))
+	f, err := os.Create(filename)
+	if err != nil {
+		ch <- fmt.Sprintln(err)
+		return
+	}
+	count, err := io.Copy(f, resp.Body)
+	if err != nil {
+		ch <- fmt.Sprintln(err)
+		return
+	}
+	spendTime := time.Since(startTime).Seconds()
+	res := fmt.Sprintf("%s has %d byte, spend %fs", urlstring, count, spendTime)
+	ch <- res
+}
+
 func serve1(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		log.Println(err)
