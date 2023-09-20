@@ -1,4 +1,4 @@
-package exercise
+package theGoProgrammingLanguage
 
 import (
 	"fmt"
@@ -78,6 +78,8 @@ func TestFetchAll(t *testing.T) {
 		fmt.Println(s)
 	}
 }
+
+//测试1.12
 func TestServe1(t *testing.T) {
 	req := httptest.NewRequest("GET", "http://127.0.0.1/?Cycles=10", nil)
 	w := httptest.NewRecorder()

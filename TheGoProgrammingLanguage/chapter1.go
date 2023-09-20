@@ -1,4 +1,4 @@
-package exercise
+package theGoProgrammingLanguage
 
 import (
 	"bufio"
@@ -202,6 +202,7 @@ func fetchAll(urlstring string, ch chan<- string) {
 	ch <- res
 }
 
+//练习1.12
 func serve1(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		log.Println(err)
